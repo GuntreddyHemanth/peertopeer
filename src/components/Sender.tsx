@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 
 export const Sender = () => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
-    const [pc, setPC] = useState<RTCPeerConnection | null>(null);
+    // const [pc, setPC] = useState<RTCPeerConnection | null>(null);
 
     useEffect(() => {
         const socket = new WebSocket('https://video-websocketserver.onrender.com');
@@ -36,7 +36,7 @@ export const Sender = () => {
             ]
         });
 
-        setPC(pc);
+        // setPC(pc);
         pc.onicecandidate = (event) => {
             if (event.candidate) {
                 socket?.send(JSON.stringify({
