@@ -52,24 +52,41 @@ export const Receiver = () => {
         //     }
         // };
 
-        socket.onmessage = (event) => {
-            const message = JSON.parse(event.data);
-            if (message.type === 'createOffer') {
-                console.log(message.sdp)
-                pc.setRemoteDescription(message.sdp).then(() => {
-                    pc.createAnswer().then((answer) => {
-                        pc.setLocalDescription(answer);
-                        socket.send(JSON.stringify({
-                            type: 'createAnswer',
-                            sdp: answer
-                        }));
-                    });
-                });
-            } else if (message.type === 'iceCandidate') {
-                pc.addIceCandidate(message.candidate);
-                console.log(message.candidate)
+        const pendingCandidates: RTCIceCandidateInit[] = [];
+        let remoteDescSet = false;
+
+        socket.onmessage = async (event) => {
+        const message = JSON.parse(event.data);
+
+        if (message.type === 'createOffer') {
+            console.log(message.sdp);
+            await pc.setRemoteDescription(message.sdp);
+            remoteDescSet = true;
+
+            // Now safe to create and send answer
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            socket.send(JSON.stringify({
+            type: 'createAnswer',
+            sdp: answer
+            }));
+
+            // Flush any stored ICE candidates
+            for (const candidate of pendingCandidates) {
+            await pc.addIceCandidate(candidate);
             }
-        };
+        }
+
+        else if (message.type === 'iceCandidate') {
+            if (remoteDescSet) {
+            await pc.addIceCandidate(message.candidate);
+            } else {
+            pendingCandidates.push(message.candidate); // Save for later
+            }
+            console.log(message.candidate);
+        }
+    };
+
     }
 
     return (
