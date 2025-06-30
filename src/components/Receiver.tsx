@@ -12,17 +12,42 @@ export const Receiver = () => {
     }, []);
 
     function startReceiving(socket: WebSocket) {
-        const pc = new RTCPeerConnection();
+        const pc = new RTCPeerConnection({
+            iceServers: [
+                {
+                urls: "stun:stun.l.google.com:19302",
+                },
+                {
+                urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                username: "0ed99389a67a32c6399ce71b",
+                credential: "61K2iL2Bg2Dc/I+U",
+                }
+            ]
+        });
+
+
+        // pc.ontrack = (event) => {
+        //     const stream = new MediaStream([event.track]);
+        //     if (videoRef.current) {
+        //         videoRef.current.srcObject = stream;
+        //         videoRef.current.muted = true;
+        //         videoRef.current.onloadedmetadata = () => {
+        //             videoRef.current?.play().catch((err) => {
+        //                 console.error("Video play failed", err);
+        //             });
+        //         };
+        //     }
+        // };
 
         pc.ontrack = (event) => {
-            const stream = new MediaStream([event.track]);
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
+            const [remoteStream] = event.streams;
+            if (videoRef.current && remoteStream) {
+                videoRef.current.srcObject = remoteStream;
                 videoRef.current.muted = true;
                 videoRef.current.onloadedmetadata = () => {
-                    videoRef.current?.play().catch((err) => {
-                        console.error("Video play failed", err);
-                    });
+                videoRef.current?.play().catch((err) => {
+                    console.error("Video play failed", err);
+                });
                 };
             }
         };
