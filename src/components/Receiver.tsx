@@ -41,6 +41,7 @@ export const Receiver = () => {
                 });
             } else if (message.type === 'iceCandidate') {
                 pc.addIceCandidate(message.candidate);
+                console.log(message.candidate)
             }
         };
     }

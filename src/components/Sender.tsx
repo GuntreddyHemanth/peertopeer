@@ -27,6 +27,7 @@ export const Sender = () => {
                 await pc.setRemoteDescription(message.sdp);
             } else if (message.type === 'iceCandidate') {
                 pc.addIceCandidate(message.candidate);
+                console.log(message.candidate)
             }
         }
 
@@ -46,6 +47,7 @@ export const Sender = () => {
         // setPC(pc);
         pc.onicecandidate = (event) => {
             if (event.candidate) {
+                console.log(event.candidate)
                 socket?.send(JSON.stringify({
                     type: 'iceCandidate',
                     candidate: event.candidate
