@@ -26,31 +26,31 @@ export const Receiver = () => {
         });
 
 
-        // pc.ontrack = (event) => {
-        //     const stream = new MediaStream([event.track]);
-        //     if (videoRef.current) {
-        //         videoRef.current.srcObject = stream;
-        //         videoRef.current.muted = true;
-        //         videoRef.current.onloadedmetadata = () => {
-        //             videoRef.current?.play().catch((err) => {
-        //                 console.error("Video play failed", err);
-        //             });
-        //         };
-        //     }
-        // };
-
         pc.ontrack = (event) => {
-            const [remoteStream] = event.streams;
-            if (videoRef.current && remoteStream) {
-                videoRef.current.srcObject = remoteStream;
+            const stream = new MediaStream([event.track]);
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
                 videoRef.current.muted = true;
                 videoRef.current.onloadedmetadata = () => {
-                videoRef.current?.play().catch((err) => {
-                    console.error("Video play failed", err);
-                });
+                    videoRef.current?.play().catch((err) => {
+                        console.error("Video play failed", err);
+                    });
                 };
             }
         };
+
+        // pc.ontrack = (event) => {
+        //     const [remoteStream] = event.streams;
+        //     if (videoRef.current && remoteStream) {
+        //         videoRef.current.srcObject = remoteStream;
+        //         videoRef.current.muted = true;
+        //         videoRef.current.onloadedmetadata = () => {
+        //         videoRef.current?.play().catch((err) => {
+        //             console.error("Video play failed", err);
+        //         });
+        //         };
+        //     }
+        // };
 
         socket.onmessage = (event) => {
             const message = JSON.parse(event.data);
