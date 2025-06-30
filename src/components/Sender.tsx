@@ -32,7 +32,14 @@ export const Sender = () => {
 
         const pc = new RTCPeerConnection({
             iceServers : [
-                {urls: 'stun:stun.l.google.com:19302'}
+                {
+                    urls: "stun:stun.l.google.com:19302", // Free STUN from Google
+                },
+                {
+                    urls: "turns:global.relay.metered.ca:443?transport=tcp", // Secure TURN (TLS)
+                    username: "0ed99389a67a32c6399ce71b",
+                    credential: "61K2iL2Bg2Dc/I+U",
+                },
             ]
         });
 
