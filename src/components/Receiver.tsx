@@ -30,6 +30,7 @@ export const Receiver = () => {
         socket.onmessage = (event) => {
             const message = JSON.parse(event.data);
             if (message.type === 'createOffer') {
+                console.log(message.sdp)
                 pc.setRemoteDescription(message.sdp).then(() => {
                     pc.createAnswer().then((answer) => {
                         pc.setLocalDescription(answer);
