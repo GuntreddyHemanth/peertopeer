@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 export const Sender = () => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
+    const videoRef = useRef<HTMLVideoElement>(null)
     // const [pc, setPC] = useState<RTCPeerConnection | null>(null);
 
     useEffect(() => {
@@ -56,6 +57,19 @@ export const Sender = () => {
             }
         }
 
+        pc.ontrack = (event) => {
+            const stream = new MediaStream([event.track])
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream
+                videoRef.current.muted = false
+                videoRef.current.onloadedmetadata = () => {
+                    videoRef.current?.play().catch((err) => {
+                        console.error("Video play failed", err);                     
+                    })
+                }
+            }
+        }
+
         pc.onnegotiationneeded = async () => {
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
@@ -70,12 +84,12 @@ export const Sender = () => {
 
     const getCameraStreamAndSend = (pc: RTCPeerConnection) => {
         navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.muted = false
-            video.play().catch(err => console.error("play error",  err));
-            // this is wrong, should propogate via a component
-            document.body.appendChild(video);
+            // const video = document.createElement('video');
+            // video.srcObject = stream;
+            // video.muted = false
+            // video.play().catch(err => console.error("play error",  err));
+            // // this is wrong, should propogate via a component
+            // document.body.appendChild(video);
             stream.getTracks().forEach((track) => {
                 pc?.addTrack(track);
             });
@@ -85,5 +99,6 @@ export const Sender = () => {
     return <div>
         Sender
         <button onClick={initiateConn}> Send data </button>
+        <video ref={videoRef} width={400} />
     </div>
 }

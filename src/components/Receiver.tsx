@@ -15,14 +15,22 @@ export const Receiver = () => {
         const pc = new RTCPeerConnection({
             iceServers: [
                 {
-                urls: "stun:stun.l.google.com:19302",
+                   urls: "stun:stun.l.google.com:19302",
                 },
                 {
-                urls: "turns:global.relay.metered.ca:443?transport=tcp",
-                username: "0ed99389a67a32c6399ce71b",
-                credential: "61K2iL2Bg2Dc/I+U",
+                    urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                    username: "0ed99389a67a32c6399ce71b",
+                    credential: "61K2iL2Bg2Dc/I+U",
                 }
             ]
+        });
+
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+            stream.getTracks().forEach((track) => {
+                pc?.addTrack(track);
+            });
+        }).catch((err) => {
+            console.error("Failed to get receiver's camera:", err);
         });
 
 
@@ -67,8 +75,8 @@ export const Receiver = () => {
             const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
             socket.send(JSON.stringify({
-            type: 'createAnswer',
-            sdp: answer
+                type: 'createAnswer',
+                sdp: answer
             }));
 
             // Flush any stored ICE candidates
@@ -92,7 +100,7 @@ export const Receiver = () => {
     return (
         <div>
             <h1>Receiver</h1>
-            <video ref={videoRef} autoPlay playsInline muted width={400} />
+            <video ref={videoRef} width={400} />
         </div>
     );
 };
