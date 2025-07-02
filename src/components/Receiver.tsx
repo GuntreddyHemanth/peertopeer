@@ -39,7 +39,7 @@ export const Receiver = () => {
             remoteStream.addTrack(event.track)
             if (videoRef.current) {
                 videoRef.current.srcObject = remoteStream;
-                videoRef.current.muted = true;
+                videoRef.current.muted = false;
                 videoRef.current.onloadedmetadata = () => {
                     videoRef.current?.play().catch((err) => {
                         console.error("Video play failed", err);
