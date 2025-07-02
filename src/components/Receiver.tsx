@@ -27,17 +27,18 @@ export const Receiver = () => {
 
         navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
             stream.getTracks().forEach((track) => {
-                pc?.addTrack(track);
+                pc?.addTrack(track, stream);
             });
         }).catch((err) => {
             console.error("Failed to get receiver's camera:", err);
         });
 
+        const remoteStream = new MediaStream();
 
         pc.ontrack = (event) => {
-            const stream = new MediaStream([event.track]);
+            remoteStream.addTrack(event.track)
             if (videoRef.current) {
-                videoRef.current.srcObject = stream;
+                videoRef.current.srcObject = remoteStream;
                 videoRef.current.muted = true;
                 videoRef.current.onloadedmetadata = () => {
                     videoRef.current?.play().catch((err) => {

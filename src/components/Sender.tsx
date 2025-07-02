@@ -56,12 +56,15 @@ export const Sender = () => {
                 }));
             }
         }
+        
+        const remoteStream = new MediaStream();
+
 
         pc.ontrack = (event) => {
-            const stream = new MediaStream([event.track])
+            remoteStream.addTrack(event.track)
             if (videoRef.current) {
-                videoRef.current.srcObject = stream
-                videoRef.current.muted = false
+                videoRef.current.srcObject = remoteStream
+                videoRef.current.muted = true
                 videoRef.current.onloadedmetadata = () => {
                     videoRef.current?.play().catch((err) => {
                         console.error("Video play failed", err);                     
@@ -91,7 +94,7 @@ export const Sender = () => {
             // // this is wrong, should propogate via a component
             // document.body.appendChild(video);
             stream.getTracks().forEach((track) => {
-                pc?.addTrack(track);
+                pc?.addTrack(track, stream);
             });
         });
     }
